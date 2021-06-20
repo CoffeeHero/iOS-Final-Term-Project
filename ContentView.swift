@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 
-struct Album : Hashable{ 
+struct Album : Hashable{
     var id = UUID()
     var name : String
     var image : String
@@ -39,7 +39,7 @@ struct ContentView: View {
         NavigationView{
             LazyVStack(spacing: 50){
                 NavigationLink(
-                    destination: MusicList_temp(data: data),
+                    destination: MixerView(),
                     label: {
                         Text("Music Modifier")
                             .font(.system(size: 30, weight: .heavy ,design: .serif))
@@ -55,7 +55,7 @@ struct ContentView: View {
                 Text("iBand").font(.system(size: 90, weight: .heavy ,design: .serif))
 //                    .italic()
                     .frame(maxWidth: .infinity, alignment: .center)
-                Text("by 鮑伽呈, 黃關明, 陳申")
+                Text("by 鮑佳呈, 黃關明, 陳申")
                     .font(.system(size: 30, weight: .light, design: .serif))
                     .italic()
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -70,6 +70,8 @@ struct MusicList : View{
     @State var currentAlbum : Album?
     @State var show = false
     @State var alert = false
+    @State var newAlbumName = ""
+    var db = Firestore.firestore()
     var body: some View {
         ScrollView{
             ScrollView(.horizontal,showsIndicators: false, content:{
@@ -78,8 +80,22 @@ struct MusicList : View{
                     album in AlbumArt(album: album,isWithText: true).onTapGesture{
                         self.currentAlbum = album
                     }
-                })
                     
+                })
+                    VStack{
+                        TextField("Album Name", text: $newAlbumName)
+                        Button(action: {
+                            db.collection("albums").document(newAlbumName).setData([
+                                "name": newAlbumName,
+                                "image": "1"
+                            ])
+                               }) {
+                                   Text("add new album")
+                                       .font(.system(size: 20))
+                                       .background(Color.white)
+                                       .foregroundColor(.black)
+                            }
+                    }
                 }
             })
             LazyVStack{
@@ -167,7 +183,6 @@ struct SongCell :View{
     }
 }
 
-
 //struct ContentView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        //ContentView(data:OurData())
@@ -233,88 +248,5 @@ struct DocumentPicker : UIViewControllerRepresentable{
             
 
         }
-    }
-}
-
-struct MusicList_temp : View{
-    @ObservedObject var data : OurData
-    @State var currentAlbum : Album?
-    @State var show = false
-    @State var alert = false
-    var body: some View {
-        ScrollView{
-            ScrollView(.horizontal,showsIndicators: false, content:{
-                LazyHStack{
-                    ForEach(self.data.albums, id:\.self,content:{
-                    album in AlbumArt(album: album,isWithText: true).onTapGesture{
-                        self.currentAlbum = album
-                    }
-                })
-                    
-                }
-            })
-            LazyVStack{
-                if (self.data.albums.first == nil){
-                    EmptyView()
-                }else{
-                ForEach((self.currentAlbum?.songs ?? self.data.albums.first?.songs) ?? [Song(time: "", name: "", file: "")], id: \.self,content:{
-                    song in SongCell(album: currentAlbum ?? self.data.albums.first!,song : song)
-                })}
-            }
-            Button(action: {
-                self.show.toggle()
-                   }) {
-                       Text("upload music")
-                           .font(.system(size: 20))
-                           .background(Color.white)
-                           .foregroundColor(.black)
-            }.sheet(isPresented: $show){
-                DocumentPicker(alert: self.$alert, album: currentAlbum ?? self.data.albums.first!)
-            }.alert(isPresented: $alert){
-                Alert(title: Text("Message"), message: Text("Upload Successfully!!!"), dismissButton: .default(Text("OK")))
-            }
-            
-        }
-    }
-}
-
-
-
-struct AlbumArt_temp : View{
-    var album : Album
-    var isWithText : Bool
-    var body: some View{
-        ZStack(alignment: .bottom, content: {
-        
-            Image(album.image).resizable().frame(width:200,height :200,alignment: .center)
-            if  isWithText == true {
-            ZStack {
-                Blur(style: .dark)
-                Text(album.name).foregroundColor(.white).frame(height:60,alignment:.center)
-            }}
-        }).frame(width:200,height:200, alignment:.center).clipped().cornerRadius(20).shadow(radius: /*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/ ).padding(20)
-    }
-}
-
-struct SongCell_temp :View{
-    var album : Album
-    var song : Song
-    var body : some View{
-        NavigationLink(
-            destination: MixerView(album: album, song: song),
-            label: {
-                HStack{
-                    ZStack{
-                        Circle().frame(width:50,height:50,alignment: .center).foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                        Circle().frame(width:20,height:20,alignment: .center).foregroundColor(.white)
-                        
-                    }
-                    Text(song.name).bold()
-                    Spacer()
-                    Text(song.time)
-                    
-                }.padding(20)
-            }).buttonStyle(PlainButtonStyle())
-        
     }
 }
