@@ -39,17 +39,24 @@ struct ContentView: View {
         NavigationView{
             LazyVStack(spacing: 50){
                 NavigationLink(
+                    
                     destination: MusicList_temp(data: data),
                     label: {
                         Text("Music Modifier")
                             .font(.system(size: 30, weight: .heavy ,design: .serif))
                     }).buttonStyle(PlainButtonStyle())
+                    .simultaneousGesture(TapGesture().onEnded{
+                        self.refreshView()
+                                    })
                 NavigationLink(
                     destination: MusicList(data: data),
                     label: {
                         Text("Music Player")
                             .font(.system(size: 30, weight: .heavy ,design: .serif))
                     }).buttonStyle(PlainButtonStyle())
+                    .simultaneousGesture(TapGesture().onEnded{
+                        self.refreshView()
+                                    })
             }
             VStack{
                 Text("iBand").font(.system(size: 90, weight: .heavy ,design: .serif))
@@ -62,6 +69,9 @@ struct ContentView: View {
             }
             
         }
+    }
+    func refreshView(){
+        data.loadAlbums()
     }
 }
 
@@ -88,6 +98,7 @@ struct MusicList : View{
                             "name": newAlbumName,
                             "image": "1"
                         ])
+                        self.refreshView()
                            }) {
                                Text("add new album")
                                    .font(.system(size: 20))
@@ -108,6 +119,7 @@ struct MusicList : View{
             }
             Button(action: {
                 self.show.toggle()
+                self.refreshView()
                    }) {
                        Text("upload music")
                            .font(.system(size: 20))
@@ -115,11 +127,20 @@ struct MusicList : View{
                            .foregroundColor(.black)
             }.sheet(isPresented: $show){
                 DocumentPicker(alert: self.$alert, album: currentAlbum ?? self.data.albums.first!)
+                
             }.alert(isPresented: $alert){
-                Alert(title: Text("Message"), message: Text("Upload Successfully!!!"), dismissButton: .default(Text("OK")))
+                Alert(title: Text("Message"), message: Text("Upload Successfully!!!"), dismissButton: .destructive(Text("OK")){
+                    self.refreshView()
+                })
             }
             
+        
+            
         }
+        
+    }
+    func refreshView(){
+        data.loadAlbums()
     }
 }
 
