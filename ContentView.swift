@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 
-struct Album : Hashable{ 
+struct Album : Hashable{
     var id = UUID()
     var name : String
     var image : String
@@ -42,7 +42,7 @@ struct ContentView: View {
                     
                     destination: MusicList_temp(data: data),
                     label: {
-                        Text("Music Modifier")
+                        Text("DJ Controller")
                             .font(.system(size: 30, weight: .heavy ,design: .serif))
                     }).buttonStyle(PlainButtonStyle())
                     .simultaneousGesture(TapGesture().onEnded{
@@ -62,7 +62,7 @@ struct ContentView: View {
                 Text("iBand").font(.system(size: 90, weight: .heavy ,design: .serif))
 //                    .italic()
                     .frame(maxWidth: .infinity, alignment: .center)
-                Text("by 鮑伽呈, 黃關明, 陳申")
+                Text("by 鮑佳呈, 黃關明, 陳申")
                     .font(.system(size: 30, weight: .light, design: .serif))
                     .italic()
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -144,27 +144,6 @@ struct MusicList : View{
     }
 }
 
-//struct UploadSong : View{
-//    @State private var path = ""
-//    var body: some View{
-//        VStack{
-//            Text("Enter song path")
-//                .font(.system(size: 30, weight: .heavy ,design: .serif))
-//            TextField("file path in your device", text: $path)
-//            Button(action: {
-//                print (path)
-//                   }) {
-//                       Text("Submit")
-//                           .font(.system(size: 40))
-//                           .background(Color.white)
-//                           .foregroundColor(.black)
-//                   }
-//        }
-//    }
-//}
-
-
-
 struct AlbumArt : View{
     var album : Album
     var isWithText : Bool
@@ -194,9 +173,9 @@ struct SongCell :View{
                         Circle().frame(width:20,height:20,alignment: .center).foregroundColor(.white)
                         
                     }
-                    Text(song.name).bold()
-                    Spacer()
-                    Text(song.time)
+                    Text(song.name).bold().frame(maxWidth: .infinity, alignment: .leading)
+//                    Spacer()
+//                    Text(song.time)
                     
                 }.padding(20)
             }).buttonStyle(PlainButtonStyle())
@@ -213,11 +192,6 @@ struct SongCell :View{
 //    }
 //}
 struct DocumentPicker : UIViewControllerRepresentable{
-//    func makeUIViewController(content: UIViewControllerRepresentableContext<DocumentPicker>) -> UIDocumentPickerViewController{
-//        let picker = UIDocumentPickerViewController(documentTypes: [], in: .open)
-//        picker.allowsMultipleSelection = false
-//        return picker
-//    }
     var db = Firestore.firestore()
     @Binding var alert : Bool
     var album : Album
@@ -295,21 +269,21 @@ struct MusicList_temp : View{
                     EmptyView()
                 }else{
                 ForEach((self.currentAlbum?.songs ?? self.data.albums.first?.songs) ?? [Song(time: "", name: "", file: "")], id: \.self,content:{
-                    song in SongCell(album: currentAlbum ?? self.data.albums.first!,song : song)
+                    song in SongCell_temp(album: currentAlbum ?? self.data.albums.first!,song : song)
                 })}
             }
-            Button(action: {
-                self.show.toggle()
-                   }) {
-                       Text("upload music")
-                           .font(.system(size: 20))
-                           .background(Color.white)
-                           .foregroundColor(.black)
-            }.sheet(isPresented: $show){
-                DocumentPicker(alert: self.$alert, album: currentAlbum ?? self.data.albums.first!)
-            }.alert(isPresented: $alert){
-                Alert(title: Text("Message"), message: Text("Upload Successfully!!!"), dismissButton: .default(Text("OK")))
-            }
+//            Button(action: {
+//                self.show.toggle()
+//                   }) {
+//                       Text("upload music")
+//                           .font(.system(size: 20))
+//                           .background(Color.white)
+//                           .foregroundColor(.black)
+//            }.sheet(isPresented: $show){
+//                DocumentPicker(alert: self.$alert, album: currentAlbum ?? self.data.albums.first!)
+//            }.alert(isPresented: $alert){
+//                Alert(title: Text("Message"), message: Text("Upload Successfully!!!"), dismissButton: .default(Text("OK")))
+//            }
             
         }
     }
@@ -346,9 +320,9 @@ struct SongCell_temp :View{
                         Circle().frame(width:20,height:20,alignment: .center).foregroundColor(.white)
                         
                     }
-                    Text(song.name).bold()
-                    Spacer()
-                    Text(song.time)
+                    Text(song.name).bold().frame(maxWidth: .infinity, alignment: .leading)
+//                    Spacer()
+//                    Text(song.time)
                     
                 }.padding(20)
             }).buttonStyle(PlainButtonStyle())

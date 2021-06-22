@@ -23,7 +23,7 @@ class OurData : ObservableObject{
     
     
     func loadAlbums(){
-        albums = [Album]()
+        albums.removeAll()
         Firestore.firestore().collection("albums").getDocuments{ (snapshot,error) in
         if error == nil {
             for document in snapshot!.documents{

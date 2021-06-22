@@ -53,7 +53,6 @@ struct PlayerView : View{
     }
     
     func playSong(){
-        
         let storage = Storage.storage().reference(forURL: self.song.file)
         storage.downloadURL{(url,error) in
             if error != nil{
@@ -68,7 +67,7 @@ struct PlayerView : View{
                 }
                 
                 player = AVPlayer(playerItem: AVPlayerItem(url: url!))
-                //player.play()
+//                player.play()
             }
             
         }
